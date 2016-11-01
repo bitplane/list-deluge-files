@@ -60,8 +60,8 @@ def list_files(url, password, torrent, type_):
         for key, item in tree['contents'].items():
             if item['type'] == 'file':
                 if not type_ or \
-		   (type_ == 'incomplete' and item['progress'] < 1.0) or \
-		   (type_ == 'complete' and item['progress'] == 1.0):
+                   (type_ == 'incomplete' and item['progress'] < 1.0) or \
+                   (type_ == 'complete' and item['progress'] == 1.0):
                     print(item['path'].encode('utf-8'))
             elif item['type'] == 'dir':
                 recurse(item)
