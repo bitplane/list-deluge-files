@@ -40,7 +40,7 @@ def authenticate(opener, url, password):
     response = post(opener, url, login_data)
     assert response['result'], 'Authentication failure'
 
-def list_files(url, password, torrent, type_):
+def list_files(url, password, torrent, show):
     cj = CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
@@ -62,9 +62,9 @@ def list_files(url, password, torrent, type_):
     def recurse(tree):
         for key, item in tree['contents'].items():
             if item['type'] == 'file':
-                if not type_ or \
-                   (type_ == 'incomplete' and item['progress'] < 1.0) or \
-                   (type_ == 'complete' and item['progress'] == 1.0):
+                if (show == 'all') or \
+                   (show == 'incomplete' and item['progress'] < 1.0) or \
+                   (show == 'complete' and item['progress'] == 1.0):
                     print(shellquote(item['path'].encode('utf-8')))
             elif item['type'] == 'dir':
                 recurse(item)
@@ -75,11 +75,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--URL', default='http://localhost:8112/json')
     parser.add_argument('--password', default='')
-    parser.add_argument('--type', default=None, help='either "complete" or "incomplete"')
+    parser.add_argument('--show', default='all', help='either "all", "complete" or "incomplete"')
     parser.add_argument('--torrent')
     args = parser.parse_args()
     list_files(url=args.URL, password=args.password,
-               torrent=args.torrent, type_=args.type)
+               torrent=args.torrent, show=args.show)
 
 if __name__ == '__main__':
     main()
