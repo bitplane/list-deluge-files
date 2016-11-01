@@ -9,10 +9,7 @@ from __future__ import print_function
 import argparse
 import gzip
 import json
-import os
-import subprocess
 import urllib2
-import urllib
 
 from cookielib import CookieJar
 from StringIO import StringIO
