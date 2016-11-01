@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""list-incomplete-deluge-files
+"""list-deluge-files
 
 Lists incomplete files from the specified torrent. Uses Deluge's web
 UI to get the list.
@@ -75,7 +75,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--URL', default='http://localhost:8112/json')
     parser.add_argument('--password', default='')
-    parser.add_argument('--show', default='all', help='either "all", "complete" or "incomplete"')
+    parser.add_argument('--show', default='all', help='can be "all", "complete" or "incomplete"')
     parser.add_argument('--torrent')
     args = parser.parse_args()
     list_files(url=args.URL, password=args.password,
