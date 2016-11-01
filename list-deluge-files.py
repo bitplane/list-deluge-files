@@ -14,6 +14,9 @@ import urllib2
 from cookielib import CookieJar
 from StringIO import StringIO
 
+def shellquote(s):
+    return "'" + s.replace("'", "'\\''") + "'"
+
 def unzipped(response):
     s = response.read()
     if response.info().get('Content-Encoding') == 'gzip':
@@ -62,7 +65,7 @@ def list_files(url, password, torrent, type_):
                 if not type_ or \
                    (type_ == 'incomplete' and item['progress'] < 1.0) or \
                    (type_ == 'complete' and item['progress'] == 1.0):
-                    print(item['path'].encode('utf-8'))
+                    print(shellquote(item['path'].encode('utf-8')))
             elif item['type'] == 'dir':
                 recurse(item)
 
