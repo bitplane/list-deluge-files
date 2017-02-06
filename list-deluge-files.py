@@ -9,6 +9,7 @@ from __future__ import print_function
 import argparse
 import gzip
 import json
+import re
 import urllib2
 
 from cookielib import CookieJar
@@ -40,17 +41,20 @@ def authenticate(opener, url, password):
     response = post(opener, url, login_data)
     assert response['result'], 'Authentication failure'
 
-def list_files(url, password, torrent, show):
+def get_torrents(opener, url):
+    ui_data = {"method":"web.update_ui","params":[["name","save_path"],{}],"id":counter()}
+    response = post(opener, url, ui_data)
+    return response['result']['torrents']
+
+def list_files(url, password, torrent_regex, show):
     cj = CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
     authenticate(opener, url, password)
 
-    ui_data = {"method":"web.update_ui","params":[["name","save_path"],{}],"id":counter()}
-    response = post(opener, url, ui_data)
-    torrents = response['result']['torrents']
+    torrents = get_torrents(opener, url)
 
-    matches = [torrent_id for torrent_id, details in torrents.items() if details['name'] == torrent]
+    matches = [torrent_id for torrent_id, details in torrents.items() if re.match(torrent_regex, details['name'].encode('utf8'))]
     assert len(matches) > 0, "Couldn't find torrent"
     assert len(matches) == 1, "Found too many matching torrents"
     
@@ -76,10 +80,10 @@ def main():
     parser.add_argument('--URL', default='http://localhost:8112/json')
     parser.add_argument('--password', default='')
     parser.add_argument('--show', default='all', help='can be "all", "complete" or "incomplete"')
-    parser.add_argument('--torrent')
+    parser.add_argument('--torrent', default='.*', help='regex for torrent name')
     args = parser.parse_args()
     list_files(url=args.URL, password=args.password,
-               torrent=args.torrent, show=args.show)
+               torrent_regex=args.torrent, show=args.show)
 
 if __name__ == '__main__':
     main()
